@@ -3,7 +3,6 @@
 **************************************************************************************
 
 *                                 2. PROGRAMS
-The
 ** Programer: Isabel Onate
 ** Date created: 02/15/2016
 ** Last modified: 
