@@ -19,7 +19,7 @@ This do file generates all the outcome variables and the indices that we will us
 For more details on what variables we decided to use, and how they are grouped see Pre-analysis plan.
 
 These variables will be grouped into sets of outcomes (religion, consumption, etc) using global macros. 
-For this reason, this do file needs to be run anytime that these globals are used in subsequend code.
+For this reason, this do file needs to be run anytime that these globals are used in subsequent code.
 
 All the indices created in this do file are standardized using the control mean and sd. 
 Therefore the mean of the control variable should allways be 0 and the sd 1
@@ -29,9 +29,12 @@ In these cases, this do file needs to be run again and the resulting database sh
 
 This do file can be modified to create different datasets in the following ways:
 	Treatment assignment:
-				Using fake treatment assignment - for running tests and making decisions included in the PAP (see notes on this) nad do file "ICM-6monthsurvey-Fake treatment"
+				Using fake treatment assignment - for running tests and 
+					making decisions included in the PAP (see notes on this) and
+					do file "ICM-6monthsurvey-Fake treatment"
 				Using original assignment - For analysis
-	Switched communities: there are 5 pairs of communities that did not follow the assignment and switched from VHL to C or from HL to V (and viceversa)
+	Switched communities: there are 5 pairs of communities that did not follow the assignment 
+						and switched from VHL to C or from HL to V (and viceversa)
 				Dropping switched communities - This is the way we decided to conduct the analysis for the paper
 				Keeping original assignment not dropping switched com - Run this to compare data and results
 				Changing treatment to the ones that communties actually recieved (what they switched to)
@@ -61,10 +64,10 @@ Note: 	To change between these options modify the macros "treat", "switched" and
 loc baseline = 0 // change this local if needed - 0 for no baseline, 1 for yes ---------- CHANGE FOR USING BASELINE
 gl treat = 1 // "0" for fake "1" for real ----------------------------------------------- CHANGE FOR REAL TREATMENT ASSIGNMENT
 gl switched = 0 // "0" for original assignment "1" for switched communities ------------- CHANGE
-loc drop = 1
+loc drop = 1  // "1" drop switched communities ------------------------------------------ CHANGE FOR INCLUDING SWITCHED COMMUNITIES
 
 // GLOBALS DO FILE
-c ICM_6ms_dir
+cd C:/ICM-Codecheck
 qui include "Do files\1-ICM-6ms-globals"
 qui include "Do files\2-ICM-6ms-programs"
 
@@ -85,7 +88,7 @@ else if `baseline' == 1 {
 	gen catholic = (religion_b == 1) // dummy for catholic
 }
 else {
-	display in r "Local for baseline is not defined correctly!" // if local baseline was not propperly defined
+	display in r "Local for baseline is not defined correctly!" // if local baseline was not properly defined
 	macro list
 	stop
 }
@@ -497,7 +500,7 @@ assert _N == 6276
 *                                 CONTROL VARIABLES
 *+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-** Number of days since June 1 2015
+** Number of days since June 1 2015 (conclusion of ICM program)
 gen date = mdy(6, 01, 2015)
 format date %d
 
@@ -508,7 +511,7 @@ format %td end_day
 gen days_june=end_day-date
 
 ** Marital status
-gen marital_resp = marital_1 // Cornelius told us that the 1st member of the household ruster is allways the respondent of the survey
+gen marital_resp = marital_1 // Cornelius told us that the 1st member of the household roster is allways the respondent of the survey
 
 gen married=1 if marital_resp==1 | marital_resp==2 // 1 = "married", 2 = "married, still lives with parents"
 replace married=0 if married!=1 & !missing(marital_resp)
@@ -631,7 +634,7 @@ forvalues i=1/5 {
 	}
 }
 
-replace lr_abuse = -lr_abuse
+replace lr_abuse = -lr_abuse // So a positive impact on this score is an improvement
 
 ** Looking at the differences in means
 qui {
@@ -777,7 +780,6 @@ tab icm_laws_heaven, nolab
 tab icm_accept_jc
 tab icm_accept_jc, nolab
 
-
 // INDEX
 
 ** Step 0: reordering
@@ -799,7 +801,7 @@ foreach var of varlist $general_religion_i $religion_know_i {
 	stan `var'	// program defined before that standandized variables
 }
 
-** Step 2: Agregating components 
+** Step 2: Aggregating components 
 
 // intrisic and extrinsic - these indices are agrregated differentely since they come from previous lit
 egen religion_intr_i = rowtotal($religion_intr_i), m
@@ -813,7 +815,7 @@ assert lr_comm_jc_d == lr_bible_d
 gen religion_listr_i_d = lr_comm_jc_d // or = to lr_bible_d. this is the dummy for whether they were asked sensitive quetsion
 
 // general and religion knowledge
-replace icm_religion = 3*icm_religion // we do this to weight by 3 as stated by the PAP
+replace z_icm_religion = 3*z_icm_religion // we do this to weight by 3 as stated by the PAP
 
 foreach x of newlist general_religion_i religion_know_i {	
 	local `x' $`x'
@@ -824,7 +826,7 @@ foreach x of newlist general_religion_i religion_know_i {
 	egen `x' = rowmean(`z_`x'')	
 }
 
-replace icm_religion = icm_religion/3 // to come back to the original var
+replace z_icm_religion = z_icm_religion/3 // to come back to the original var
 
 
 ** Step 3: Standardizing index
@@ -865,9 +867,9 @@ note z_religion_intr_i: "Standardized - calculated without reversing order"
 note z_religion_intr_r_i: "Religion Intrinsic Index"
 note z_religion_intr_r_i: "Standardized - calculated as in lit (reversing order of 3 questions)"
 note z_religion_intr_a_i: "Religion Intrinsic Index"
-note z_religion_intr_a_i: "Standardized - only 5 questions that dont neet to be reversed"
+note z_religion_intr_a_i: "Standardized - only 5 questions that dont need to be reversed"
 note z_religion_intr_b_i: "Religion Intrinsic Index"
-note z_religion_intr_b_i: "Standardized - only 3 questions that neet to be reversed"
+note z_religion_intr_b_i: "Standardized - only 3 questions that need to be reversed"
 
 note z_religion_extr_i: "Religion Extrinsic Index"
 note z_religion_extr_i: "Standardized - calculated as in literature"
@@ -905,10 +907,10 @@ loc celebration_spending 	w21 /// Weddings
 // NEW VARIABLES
 
 egen food_consumption = rowtotal(`food_consumption')
-replace food_consumption = food_consumption*(30/7) // we make consumption a monthly meassuremnt to make in comparable with income
+replace food_consumption = food_consumption*(30/7) // we make consumption a monthly measurement to make in comparable with income
 
 egen nonfood_consumption = rowtotal(`nonfood_consumption')
-replace nonfood_consumption = nonfood_consumption*(30/7) // we make consumption a monthly meassuremnt to make in comparable with income
+replace nonfood_consumption = nonfood_consumption*(30/7) // we make consumption a monthly measurement to make in comparable with income
 
 egen celebration_spending = rowtotal(`celebration_spending')
 replace celebration_spending = celebration_spending/6
@@ -954,7 +956,6 @@ replace hungry_lean_d=0 if hs6==1
 *label val hungry_lean_d hungry_lean_d 
 
 ** Number of days someone went to bed hungry (last 7 days): reorder!!! -----------------------------CHECK!!
-gen hs7_neg = -hs7
 gen hs7_inv = 7-hs7
 
 // LABELS AND NOTES
@@ -1028,7 +1029,7 @@ forvalues i=1/20 {
 
 local act agr_labor livestock formal_employ self_employ daily_labor uncl_employ
 
-forvalues i=1/6 {                                   // 6 new classifications following the fiel team recomendations 
+forvalues i=1/6 {                                   // 6 new classifications following the field team recomendations 
 	local x : word `i' of `act'
 	loc pay_`x'
 	forvalues n=1/20 {
@@ -1115,9 +1116,9 @@ note household_income: "Total paymemts for all activities - all members of the h
 **************************************************************************************
 ************************************ LABOR SUPPLY ************************************ ////// CHECK- DROP VARS THAT WE DONT USE
 **************************************************************************************					
-** TIME SPENT WORING OUTSIDE THE HOUSEHOLD (HOURS)
+** TIME SPENT WORKING OUTSIDE THE HOUSEHOLD (HOURS)
 
-** Agragate the following variables for all members of the household and different economic activities: 
+** Aggregate the following variables for all members of the household and different economic activities: 
 
 local N =_N
 local act agr_labor livestock formal_employ self_employ daily_labor uncl_employ 
@@ -1238,7 +1239,7 @@ foreach var of varlist $kessler_i {
 	stan `var'
 }
 
-** Step 2: Agregating - Kessler index 
+** Step 2: Aggregating - Kessler index 
 local kessler_i $kessler_i
 local z_kessler_i 
 foreach var of local kessler_i {
@@ -1252,7 +1253,7 @@ foreach var of varlist $life_satisfacton_i {
 }
 
 
-** Step 2: Agregating - Life satisfaction index
+** Step 2: Aggregating - Life satisfaction index
 local life_satisfacton_i $life_satisfacton_i
 local z_life_satisfacton_i 
 foreach var of local life_satisfacton_i {
@@ -1264,7 +1265,7 @@ egen life_satisfacton_i = rowmean(`z_life_satisfacton_i')
 ** Step 3: Standardizing the index
 stan life_satisfacton_i
 
-note kessler_i: "Kessler psycological scale"
+note kessler_i: "Kessler psychological scale"
 note z_life_satisfacton_i: "Life satisfaction index"
 note z_life_satisfacton_i: "Standardized"
 
@@ -1416,7 +1417,7 @@ foreach var of varlist $internal_i $chance_i {
 	stan `var'
 }
 
-** Step 2: Agregating - subindices
+** Step 2: Aggregating - subindices
 foreach x of newlist internal_i chance_i {	
 	local `x' $`x'
 	local z_`x' 
@@ -1431,7 +1432,7 @@ foreach var of varlist $stress_i $others_i $locus_control_i {
 	stan `var'
 }
 
-** Step 2: Agregating components - main indices
+** Step 2: Aggregating components - main indices
 foreach x of newlist stress_i others_i locus_control_i {	
 	local `x' $`x'
 	local z_`x' 
@@ -1462,7 +1463,7 @@ note z_chance_i: "Standardized"
 **************************************************************************************
 // NEW VARIBALES
 
-** to check for consistency in optimism/pesimism vars
+** to check for consistency in optimism/pessimism vars
 gen opt_pes = r1 + r2
 tab opt_pes
 
@@ -1502,7 +1503,7 @@ foreach var of varlist $life_orientation_i $expectations_i $optimism_i {
 	stan `var'	
 }
 
-** Step 2: Agregating components 
+** Step 2: Aggregating components 
 foreach x of newlist life_orientation_i expectations_i optimism_i {	
 	local `x' $`x'
 	local z_`x' 
@@ -1570,7 +1571,7 @@ foreach var of varlist $grit_i $self_control_i  {
 	stan `var'	
 }
 
-** Step 2: Agregating components 
+** Step 2: Aggregating components 
 foreach x of newlist grit_i self_control_i {	
 	local `x' $`x'
 	local z_`x' 
@@ -1961,7 +1962,7 @@ foreach var of varlist $hygiene_i {
 	stan `var'	
 }
 
-** Step 2: Agregating components 
+** Step 2: Aggregating components 
 
 egen hygiene_listr_i = rowmean($hygiene_listr_i)
 assert lr_treat_water_d == lr_wash_hands_d
@@ -2025,10 +2026,10 @@ replace leakfree_some_d = 0 if v4 == 1
 
 ** Lock
 gen lock_all_d = 1 if v5 == 1
-replace lock_all_d = 0 if v4 == 2 | v4 == 3
+replace lock_all_d = 0 if v5 == 2 | v5 == 3
 
-gen lock_some_d = 1 if v4 == 1 | v4 == 2
-replace lock_some_d = 0 if v4 == 3
+gen lock_some_d = 1 if v5 == 1 | v5 == 2
+replace lock_some_d = 0 if v5 == 3
 
 
 ** Electricity
@@ -2037,7 +2038,7 @@ replace electricity_d = 1 if v18_1 == 2 | v18_2 == 2
 replace electricity_d =. if v18_1 == . & v18_2 == .
 // should we have a var that is electricity, others, no lighting arrangement?
 
-** Latrine in house - note: values were inverted in claning do file so they dont correspond to survey sheet
+** Latrine in house - note: values were inverted in cleaning do file so they dont correspond to survey sheet
 gen lt_house_d = .
 replace lt_house_d = 1 if lt3 == 4 
 replace lt_house_d = 0 if lt3 == 1 | lt3 == 2 | lt3 == 3
@@ -2131,6 +2132,7 @@ forvalues i=1/20 { // watch out for number of migrators!!
 		gen loc_work_days_`i' = loc_work_time_`i' if loc_work_time_unit_`i'==1
 		replace loc_work_days_`i' = loc_work_time_`i'*7 if loc_work_time_unit_`i'==2
 		replace loc_work_days_`i' = loc_work_time_`i'*30 if loc_work_time_unit_`i'==3
+		replace loc_work_days_`i' = 180 if loc_work_days_`i' > 180 & !missing(loc_work_days_`i')
 		local loc_work_days `loc_work_days' loc_work_days_`i'
 	}
 	if _rc!=0 {
@@ -2164,7 +2166,6 @@ replace loc_work_days = 0 if migrator_count == 0
 
 egen migrators_remit_cash = rowtotal(`remit_cash'), missing // dont knows are treated as 0 when aggregating members of the household
 replace migrators_remit_cash = 0 if migrator_count == 0 
-
 
 local remit_d
 local remit_amount
@@ -2227,7 +2228,6 @@ note loc_work_days: "Number of days someone was away from the household (last 6 
 note migrators_remit_cash: "Number of migrators that sent remitances or brought cash home (last 6 months)"
 note remit_cash_d: "Households that recieved remittances or had someone bring cash home (binary - last 6 months)"
 note remit_cash_amount: "Ammount recieved in remittances or cash brought home (last 6 months)"
-
 
 gl migration_i  	migrator_count ///
 					loc_work_days ///
@@ -2327,7 +2327,7 @@ gl labor_supply_children	tothrs_agr_labor_ch ///
 
 gl child_labor $labor_supply_children children_school // check if this var is balanced
 
-stop
+
 **************************************************************************************
 ***************************************** SAVING *************************************
 **************************************************************************************
