@@ -44,7 +44,8 @@ local baseline = 0 // "0" for data without baseline "1" for data with ----------
 
 
 // GLOBALS DO FILE
-c ICM_6ms_dir
+cd "C:\github\ICM-Codecheck\"
+*c ICM_6ms_dir
 qui include "Do files\1-ICM-6ms-globals"
 qui include "Do files\2-ICM-6ms-programs"
 
@@ -310,12 +311,12 @@ recode feel_partial_day (98=-98)
 recode feel_doc_day (98=-98)
 
 
-// CLASSIFY VARIBALES
+// CLASSIFY VARIABLES
 qui ds, has(type numeric) 								// Numeric variables
 local numeric `r(varlist)' 
 qui ds, has(vallabel) 									// Variables with value labels (categorical)
 local labels `r(varlist)'
-local num_lab : list numeric & labels 					// Numeric variables with value labels - KELSEY: do you see any reason why this group should be different to the one saved as "`labels'"?
+local num_lab : list numeric & labels 					// Numeric variables with value labels 
 local num_nolab : list numeric - labels 				// numeric variables without value labels
 
 assert `: word count `labels'' == `: word count `num_lab''
@@ -339,7 +340,7 @@ foreach var of local num_lab { 								// this could also use the local "labels"
 *+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 *                                  RECODE BINARY VARIABLES
 *+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// In the CTO instrument binnary variables had different values. 
+// In the CTO instrument binary variables had different values. 
 
 
 preserve
@@ -355,10 +356,10 @@ foreach x of local labels {
 		if _rc==0 {
 			cap labrec `var' (2=0)
 		}
-		if _rc==111 {
+		else if _rc==111 {
 			local ambiguous `ambiguous' `var'
 		}
-		if _rc!=0 & _rc!=111 {
+		else if _rc!=0 & _rc!=111 {
 			local errors `errors' `var'
 		}
 	}

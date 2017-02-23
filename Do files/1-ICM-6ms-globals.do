@@ -17,13 +17,13 @@
 
 gl user = "\ifalomir" // ------------------------------- for Isabel Onate (change for sifferent users)
 
-gl home = "C:\ICM-Codecheck\6th Month Survey"
-gl raw = "C:\ICM-Codecheck\6th Month Survey\Raw"
-gl data = "C:\ICM-Codecheck\Data"
-gl do_files = "C:\ICM-Codecheck\Do files"
-gl others = "C:\ICM-Codecheck\Others"
-gl results = "C:\ICM-Codecheck\Results"
-gl baseline_raw = "C:\ICM-CodecheckICM Baseline\Raw"
+gl home = "C:\github\ICM-Codecheck"
+gl raw = "C:\github\ICM-Codecheck\Raw"
+gl data = "C:\github\ICM-Codecheck\Data"
+gl do_files = "C:\github\ICM-Codecheck\Do files"
+gl others = "C:\github\ICM-Codecheck\Others"
+gl results = "C:\github\ICM-Codecheck\Results"
+gl baseline_raw = "C:\github\ICM-CodecheckICM Baseline\Raw"
 
 *gl raw = "C:\Users\$user\Dropbox\ICM Project Management - Internal\16. Data\6th Month Survey\Raw" // Dropbox
 *gl raw = "X:\Box.net\ICM Character Development\12_Data\5_6thMonth_Data(IO)\Stata" //
